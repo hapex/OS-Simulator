@@ -19,6 +19,8 @@ namespace OS_Simulator
         private double _RemainingTime;
         private double _RunTime;
 
+        public int ProcessID;
+
         // constructor
         public Process()
         {
