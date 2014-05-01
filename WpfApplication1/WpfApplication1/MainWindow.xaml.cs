@@ -25,7 +25,7 @@ namespace OS_Simulator
             InitializeComponent();
             Queue steve = new Queue(1, 8192);
             steve.Generate_Data();
-            steve.Run_Mem_Sim_Paging();
+            steve.Run_Mem_Simple_Paging();
         }
 
         private void OnProcessSimClicked(object sender, RoutedEventArgs e)

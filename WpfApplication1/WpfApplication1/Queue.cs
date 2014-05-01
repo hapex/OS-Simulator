@@ -219,7 +219,7 @@ namespace OS_Simulator
 
         }
 
-        public void Run_Mem_Sim_Paging()
+        public void Run_Mem_Simple_Paging()
         {
             // run each block sim on these as : 512byte, 1024, 2048, 4096
             Memory half, one, two, four;
@@ -279,6 +279,11 @@ namespace OS_Simulator
             _Page2 = new Collection<string>(one.Get_Report());
             _Page3 = new Collection<string>(two.Get_Report());
             _Page4 = new Collection<string>(four.Get_Report());
+
+        }
+
+        public void Run_Paging_Rotation_FIFO()
+        {
 
         }
 
