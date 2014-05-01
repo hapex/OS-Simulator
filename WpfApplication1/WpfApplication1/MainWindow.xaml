@@ -7,17 +7,17 @@
         <TextBox Text="OS Simulator" Height="35" Width="120" FontSize="20" VerticalAlignment="Top"/>
         
         <ProgressBar Height="20" Margin="0,40,0,259"></ProgressBar>
-        
-        <Button Height="35" Width="140" Margin="184,90,183,201">
+
+        <Button Height="35" Width="140" Margin="184,90,183,201" Click="OnProcessSimClicked">
                 <Label>Run Process Simulation</Label>
             </Button>
-        <Button Height="35" Width="140" Margin="184,130,183,161">
+        <Button Height="35" Width="140" Margin="184,130,183,161" Click="OnMemorySimClicked">
                 <Label>Run Memory Simulation</Label>
             </Button>
-        <Button Height="35" Width="140" Margin="184,170,183,121">
+        <Button Height="35" Width="140" Margin="184,170,183,121" Click="OnPagingSimClicked">
                 <Label>Paging Simulation</Label>
             </Button>
-        <Button Height="35" Width="140" Margin="184,210,183,81">
+        <Button Height="35" Width="140" Margin="184,210,183,81" Click="OnBestClicked">
             <Label>Combinded Best</Label>
         </Button>
         <Button Height="35" Width="75" Margin="184,250,183,41">

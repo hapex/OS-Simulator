@@ -11,45 +11,89 @@ namespace OS_Simulator
         // members
         private DateTime _Start;
         private DateTime _End;
-        private double _AriveTime;
-        private double _BurstTime;
+
         // will be -20 t0 20 for priority, lowest is highest priority
         private int _Priority;
-        // used for preemption
-        private double _RemainingTime;
-        private double _RunTime;
+        private long _RemainingTime;
 
-        public int ProcessID;
+        public long Size;
+        public string ProcessID;
+        public int Priority
+        {
+            get
+            {
+                return _Priority;
+            }
+        }
+
+        public long RemainingTime
+        {
+            get
+            {
+                return _RemainingTime;
+            }
+        }
+
+        public long StartTime
+        {
+            get
+            {
+                return Make_Milliseconds(_Start);
+            }
+        }
+
+        public long FinishedTime
+        {
+            get
+            {
+                return Make_Milliseconds(_End);
+            }
+        }
 
         // constructor
         public Process()
         {
-            _AriveTime = 0;
-            _BurstTime = 0;
+            _Start.AddSeconds(0);
+            _End.AddSeconds(0);
             _Priority = 0;
+        }
+
+        public static long Get_Current_Time()
+        {
+            return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         }
 
         public Process(double ariveTime, double burstTime, int priority)
         {
-            _AriveTime = ariveTime;
-            _BurstTime = burstTime;
+            _Start = DateTime.Now;
+            _Start.AddSeconds(ariveTime);
+            
+            _End = new DateTime(Make_Milliseconds(_Start));
             _Priority = priority;
         }
 
         public Process(double ariveTime, double burstTime)
         {
-            _AriveTime = ariveTime;
-            _BurstTime = burstTime;
+            _Start = DateTime.Now;
+            _Start.AddSeconds(ariveTime);
+
+            _End = new DateTime(Make_Milliseconds(_Start));
             _Priority = 0;
+        }
+
+        private long Make_Milliseconds(DateTime start)
+        {
+            double mil = start.ToUniversalTime().Subtract(new
+                         DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+                         .TotalMilliseconds;
+            return (long)mil;
         }
         
         public void PreEmpt()
         {
             // get time ran
             _End = DateTime.Now;
-            double mSec = _End.Subtract(_Start).Milliseconds;
-
-            _RemainingTime = _BurstTime - mSec;
+            _RemainingTime = _End.Subtract(_Start).Milliseconds;
         }
 
         public void Start()
