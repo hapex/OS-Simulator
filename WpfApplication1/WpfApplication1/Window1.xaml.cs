@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Forms;
 
 namespace WpfApplication1
 {
@@ -24,5 +25,17 @@ namespace WpfApplication1
             // needs rework for dialog after simulation....
             //InitializeComponent();
         }
+
+        private void Window_Loaded(object sedner, RoutedEventArgs e)
+        {
+            System.Windows.Forms.Integration.WindowsFormsHost host =
+                new System.Windows.Forms.Integration.WindowsFormsHost();
+
+        }
     }
+
+    
 }
+
+
+
