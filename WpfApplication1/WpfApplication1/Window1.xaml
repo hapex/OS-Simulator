@@ -10,7 +10,7 @@
         </oxy:Plot>
         <StackPanel>
             <WindowsFormsHost x:Name="host" Height="380" Width="485">
-                <winformchart:Chart x:Name="Graph"/>
+                <winformchart:Chart x:Name="Graph" Dock="Fill"/>
             </WindowsFormsHost>
         </StackPanel>
 
