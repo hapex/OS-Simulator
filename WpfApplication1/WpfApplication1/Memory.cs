@@ -20,6 +20,9 @@ namespace OS_Simulator
         private List<string> _InternalFragReport;
         private bool _Replace;
         private int _ReplaceMethod;
+        private long _PageFaults = 0;
+        private long _FailedInserts = 0;
+        private long _PageAccesses = 0;
 
         /* replacement methods are
          * 0 - FIFO
@@ -160,6 +163,33 @@ namespace OS_Simulator
             long blockSize;
             // calculate number of table entries needed
 
+            _PageAccesses += 1;
+
+            if (_InternalFragReport.Contains(name))
+            {
+                // update used time if 1-4
+                if (_ReplaceMethod > 0 && _ReplaceMethod < 5)
+                {
+                    // get string except end and replace
+                    int now = MakeIntTime();
+                    string target = _InternalFragReport.FirstOrDefault(o=>o.Contains(name));  
+                    if (target == null)
+                    {
+                        throw new Exception ("WTF");
+                    }
+                    _InternalFragReport.Remove(target);
+                    target = target.Substring(0,target.LastIndexOf(" "));
+                    target += now.ToString();
+                    _InternalFragReport.Add(target);
+                }
+
+                return;
+            }
+
+            // if item needs to be loaded, count the fault
+
+            _PageFaults += 1;
+
             if (_BlockSize == .5)
             {
                 blockCount = ((int)Math.Ceiling((double)(bytesOfData) / 512));
@@ -173,6 +203,7 @@ namespace OS_Simulator
                 }
                 blockSize = 512;
             }
+
             else if (_BlockSize == 1)
             {
                 blockCount = ((int)Math.Ceiling((double)(bytesOfData) / 1024));
@@ -186,6 +217,7 @@ namespace OS_Simulator
                 }
                 blockSize = 1024;
             }
+
             else if (_BlockSize == 2)
             {
                 blockCount = ((int)Math.Ceiling((double)(bytesOfData) / 2048));
@@ -199,6 +231,7 @@ namespace OS_Simulator
                 }
                 blockSize = 2048;
             }
+
             else //(_BlockSize == 4)
             {
                 blockCount = ((int)Math.Ceiling((double)(bytesOfData) / 4096));
@@ -215,26 +248,25 @@ namespace OS_Simulator
 
 
                 int i = 0;
-                // find open location
+                // find open location if not already in memory
                 while (_Table[i] && i < _PageCount - blockCount && Next_Blocks_Open(i, blockCount))
                 {
-                    i += 1;
+                    i += 1;                    
                 }
 
                 if (!_Replace)
                 {
-
+                    // failure to insert
                     if (i >= _PageCount - blockCount)
                     {
-                        insert = "Removing new instance of " + name + ".  Ran out of memory inserting into table.";
-                        _InternalFragReport.Add(insert);
+                        _FailedInserts += 1;
                         return;
                     }
 
                     // insert lives at i
                     insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
                              + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "1";
-                    // count of uses      ^
+                                                                             // count of uses      ^
                     //mark it used
                     for (int j = i; j < i + blockCount; j += 1)
                     {
@@ -250,30 +282,35 @@ namespace OS_Simulator
                     {
                         // if replacement is needed
                         if (i >= _PageCount - blockCount)
-                        {
-                            // make scratch locations list
-                            List<string> tempLocationsList = new List<string>(_InternalFragReport);
-
+                        {   
                             // check on size as FIFO, if less than needed we will cascade through the next n pages
                             // to get space enought to build
-
-
-                            // find oldest inserts using last value as time of insert in unix time
-                            string target = tempLocationsList.OrderBy(o => int.Parse(o.Substring(o.LastIndexOf(" ")))).First();
                             
-                            // strip this block by getting indices
-                            int start = int.Parse(target.Substring(0, target.IndexOf(" ")));
-                            string temp = target.Substring(target.IndexOf(" - ") + 3);
-                            int end = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+                            int sizeFreed = 0;
+                            while (sizeFreed < blockCount)
+                            {
+                                // find oldest inserts using last value as time of insert in unix time
+                                string target = _InternalFragReport.OrderBy(o => int.Parse(o.Substring(o.LastIndexOf(" ")))).First();
 
-                            Remove(start, end);
+                                // strip this block by getting indices
+                                int start = int.Parse(target.Substring(0, target.IndexOf(" ")));
+                                string temp = target.Substring(target.IndexOf(" - ") + 3);
+                                int end = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                                sizeFreed = end - start;
+
+                                Remove(start, end);
+
+                                // now remove target from list as it's been nuked
+                                _InternalFragReport.Remove(target);
+                            }                           
 
                         }
-                        int now = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        int now = MakeIntTime()
                         // insert lives at i
                         insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
-                                 + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + now.ToString();
-                        // count of uses      ^
+                                 + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "0" + now.ToString();
+                                                                                 // count of uses      ^ (pointless here)
                         //mark it used
                         for (int j = i; j < i + blockCount; j += 1)
                         {
@@ -289,7 +326,7 @@ namespace OS_Simulator
                         // find last used by time
                         }
                         // insert lives at i
-                        int now = (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+                        int now = MakeIntTime()
                         insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
                                  + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + now.ToString();
                         // count of uses      ^
@@ -374,6 +411,11 @@ namespace OS_Simulator
                         _InternalFragReport.Add(insert);
                     }
                 }
+        }
+
+        private static int MakeIntTime()
+        {
+            return (int)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
 
         private bool Next_Blocks_Open(long i, long count)

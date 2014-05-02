@@ -237,11 +237,11 @@ namespace OS_Simulator
             // start with the halfs
             half = new Memory(.5, 0, 4 * byteTotal, (int) Math.Floor((double)(4 * byteTotal / 512)), 0);
 
-            // for the next 5 seconds, generate random inserts and random removals of data to this set
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
             Stopwatch sw = new Stopwatch();
             Random rand = new Random();
             sw.Start();
-            while (sw.ElapsedMilliseconds < 5000)
+            while (sw.ElapsedMilliseconds < 10000)
             {
                 half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
@@ -250,7 +250,7 @@ namespace OS_Simulator
 
             one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0);
             sw.Start();
-            while (sw.ElapsedMilliseconds < 5000)
+            while (sw.ElapsedMilliseconds < 10000)
             {
                 one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
@@ -259,7 +259,7 @@ namespace OS_Simulator
 
             two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0);
             sw.Start();
-            while (sw.ElapsedMilliseconds < 5000)
+            while (sw.ElapsedMilliseconds < 10000)
             {
                 two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
@@ -268,7 +268,7 @@ namespace OS_Simulator
 
             four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0);
             sw.Start();
-            while (sw.ElapsedMilliseconds < 5000)
+            while (sw.ElapsedMilliseconds < 10000)
             {
                 four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
