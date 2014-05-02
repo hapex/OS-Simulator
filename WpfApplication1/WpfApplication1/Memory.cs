@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace OS_Simulator
         private double _UsedSpace;
         private string _Name;
         private bool[] _Table;
+        private int[] _Age;
         private List<string> _InternalFragReport;
         private List<string> _SecondChanceList;
         private bool _Replace;
@@ -25,6 +27,8 @@ namespace OS_Simulator
         private long _PageFaults = 0;
         private long _FailedInserts = 0;
         private long _PageAccesses = 0;
+        private Tuple<int, int> _TargetedDeletes; // Locations used for different pages
+        private FileInfo[] _AllFiles;
 
         /* replacement methods are
          * 0 - FIFO
@@ -35,6 +39,7 @@ namespace OS_Simulator
          * 5 - Clock
          */
         // getter's setter's
+
         public double Start
         {
             get
@@ -145,6 +150,8 @@ namespace OS_Simulator
             _PageCount = pages;
 
             _Table = new bool[_PageCount];
+            _Age = new int[_PageCount];
+            
             // initialize the pages to empty;
             for (int i = 0; i < _PageCount; i += 1)
             {
@@ -158,7 +165,7 @@ namespace OS_Simulator
 
         #endregion
 
-#region Methods
+        #region Methods
 
         public double External_Fragmentation_Percent()
         {
@@ -386,7 +393,7 @@ namespace OS_Simulator
                     _InternalFragReport.Add(insert);
                 }
 
-                //
+                // LFU
                 else if (_ReplaceMethod == 2)
                 {
                     // if replacement is needed
@@ -428,37 +435,20 @@ namespace OS_Simulator
 
                     _InternalFragReport.Add(insert);
                 }
+
+                // Optimal
                 else if (_ReplaceMethod == 3)
                 {
                     if (i >= _PageCount - blockCount)
                     {
                         // find last used by optomal
-                    }
-                    // insert lives at i
-                    insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
-                             + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "1";
-                    // count of uses      ^
-                    //mark it used
-                    for (int j = i; j < i + blockCount; j += 1)
-                    {
-                        _Table[i] = true;
-                    }
-
-                    _InternalFragReport.Add(insert);
-                }
-                else if (_ReplaceMethod == 4)
-                {
-                    // if replacement is needed
-                    if (i >= _PageCount - blockCount)
-                    {
-                        // check on size as FIFO, if less than needed we will cascade through the next n pages
-                        // to get space enought to build
-
                         int sizeFreed = 0;
                         while (sizeFreed < blockCount)
                         {
-                            // find smalleset used and move that to the front of the string
-                            string target = _InternalFragReport.OrderBy(o => Get_Used_Count(o)).First();
+                            // get the string to kill
+                            string find = Get_Next_To_Kill();
+
+                            string target = _InternalFragReport.First(o=>o.Contains(find));
 
                             // strip this block by getting indices
                             int start = int.Parse(target.Substring(0, target.IndexOf(" ")));
@@ -474,11 +464,10 @@ namespace OS_Simulator
                         }
 
                     }
-                    int now = MakeIntTime();
                     // insert lives at i
                     insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
-                             + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "1" + now.ToString();
-                    // count of uses      ^ (pointless here)
+                             + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "1";
+                    // count of uses      ^
                     //mark it used
                     for (int j = i; j < i + blockCount; j += 1)
                     {
@@ -487,13 +476,13 @@ namespace OS_Simulator
 
                     _InternalFragReport.Add(insert);
                 }
-                else if (_ReplaceMethod == 5)
+
+                //Second Chance
+                else if (_ReplaceMethod == 4)
                 {
                     // if replacement is needed
                     if (i >= _PageCount - blockCount)
                     {
-                        // check on size as FIFO, if less than needed we will cascade through the next n pages
-                        // to get space enought to build
 
                         int sizeFreed = 0;
                         while (sizeFreed < blockCount)
@@ -516,7 +505,7 @@ namespace OS_Simulator
 
                                     // now remove target from list as it's been nuked
                                     _InternalFragReport.Remove(target);
-                                    
+
                                     // as done, break to recheck or insert and finish
                                     break;
                                 }
@@ -539,6 +528,55 @@ namespace OS_Simulator
                     {
                         _Table[i] = true;
                     }
+
+                    _InternalFragReport.Add(insert);
+                }
+
+                // Clock
+                else if (_ReplaceMethod == 5)
+                {
+                    // if replacement is needed
+                    if (i >= _PageCount - blockCount)
+                    {
+                        // check on size as FIFO, if less than needed we will cascade through the next n pages
+                        // to get space enought to build
+
+                        int sizeFreed = 0;
+                        while (sizeFreed < blockCount)
+                        {
+                            // find oldest insert using age table
+                            int largest = _Age.Max();
+                            int address = _Age.ToList().IndexOf(largest);
+                            
+                            string target = _InternalFragReport.OrderBy(o => int.Parse(o.Substring(o.IndexOf(" "))) == address).First();
+
+                            // strip this block by getting indices
+                            int start = int.Parse(target.Substring(0, target.IndexOf(" ")));
+                            string temp = target.Substring(target.IndexOf(" - ") + 3);
+                            int end = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                            sizeFreed = end - start;
+
+                            Remove(start, end);
+
+                            // now remove target from list as it's been nuked
+                            _InternalFragReport.Remove(target);
+                        }
+
+                    }
+                    int now = MakeIntTime();
+                    // insert lives at i
+                    insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
+                             + name + " " + bytesWasted.ToString() + " " + blockSize.ToString() + "0" + now.ToString();
+                    // count of uses      ^ (pointless here)
+                    //mark it used
+                    for (int j = i; j < i + blockCount; j += 1)
+                    {
+                        _Table[i] = true;
+                        _Age[i] += 1;
+                    }
+
+                    //
 
                     _InternalFragReport.Add(insert);
                 }
@@ -623,6 +661,50 @@ namespace OS_Simulator
             int index = s.LastIndexOf(" ");
             return int.Parse(s.Substring(s.LastIndexOf(" ", 0, index), index));
         }
+
+        // Omnipresence goes here (knowledge of what files will be done)
+        public void Establish_List(FileInfo[] files)
+        {
+            var temp = new List<FileInfo>();
+
+            Random rand = new Random();
+
+            for (int i = 0; i < 1000 ; i +=1)
+            {
+                FileInfo fi = files[rand.Next(files.Length)];
+                temp.Add(fi);
+            }
+                // make new
+            _AllFiles = new List<FileInfo>(temp).ToArray();
+        }
+
+        private string Get_Next_To_Kill()
+        {
+            Dictionary<string, int> mapper = new Dictionary<string, int>();
+
+            // use page accesses to determine what should be replaced
+            for (long i = _PageAccesses; i < _AllFiles.Length ; i +=1)
+            {
+                // if not in the dictionary
+                if (!mapper.ContainsKey(_AllFiles[i].Name))
+                {
+
+                    // and if it does not exist in the frag report, we get null back, so put in a 0 value for it
+                    if (_InternalFragReport.FirstOrDefault(o=>o.Contains(_AllFiles[i].Name)) == null)
+                    {
+                        // return this because it is 0 and you don't have less than this
+                        return _AllFiles[i].Name;
+                    }
+                    // else we enter it
+                    int index = _InternalFragReport.IndexOf(_AllFiles[i].Name);
+                    mapper.Add(_AllFiles[i].Name, index);
+
+                }
+            }
+            // if we hit here we find the largest index in the mapper
+            return mapper.OrderByDescending(o => o.Value).First().Key;
+        }
+
 #endregion
     }
 }
