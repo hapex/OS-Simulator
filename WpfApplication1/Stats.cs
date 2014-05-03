@@ -10,10 +10,10 @@ namespace WpfApplication1
     {
         public string Name;
         public string Grouping;
-        public List<double> ParameterList;
+        public Tuple<double,double> ParameterList;
         public Stats()
         {
-            ParameterList = new List<double>();
+            ParameterList = new Tuple<double, double>();
         }
     }
 }
