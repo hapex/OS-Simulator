@@ -1,0 +1,31 @@
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.exe.config
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\OS_Simulator.csprojResolveAssemblyReference.cache
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\ShineyBlue.baml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\MainWindow.baml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\Window1.baml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\App.baml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\MainWindow.g.cs
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\Window1.g.cs
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\App.g.cs
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1_MarkupCompile.cache
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.g.resources
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.Properties.Resources.resources
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\OS_Simulator.csproj.GenerateResource.Cache
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.exe
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.pdb
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.dll
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Wpf.dll
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Xps.dll
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\WPFToolkit.dll
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.pdb
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.xml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Wpf.pdb
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Wpf.xml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Xps.pdb
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\OxyPlot.Xps.xml
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\bin\Debug\WPFToolkit.pdb
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.exe
+C:\Users\Alex\documents\visual studio 2013\Projects\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.pdb
+C:\Users\Alex\Desktop\New folder\trunk\WpfApplication1\WpfApplication1\bin\Debug\WpfApplication1.exe.config
+C:\Users\Alex\Desktop\New folder\trunk\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.exe
+C:\Users\Alex\Desktop\New folder\trunk\WpfApplication1\WpfApplication1\obj\Debug\WpfApplication1.pdb
