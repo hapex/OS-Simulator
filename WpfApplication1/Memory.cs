@@ -177,7 +177,7 @@ namespace OS_Simulator
             int used = 0;
             for (int i = 0 ; i < _Table.Length ; i +=1)
             {
-                if (_Table[i])
+                if (!_Table[i])
                 {
                     used +=1;
                 }
@@ -196,7 +196,7 @@ namespace OS_Simulator
 
             _PageAccesses += 1;
 
-            if (_InternalFragReport.Contains(name))
+            if (_InternalFragReport.FirstOrDefault(o=>o.Contains(name)) != null)
             {
                 // update used time if 1-4
                 if (_ReplaceMethod > 0 && _ReplaceMethod < 5)

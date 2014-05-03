@@ -28,9 +28,9 @@ namespace WpfApplication1
 
         private void Window_Loaded(object sedner, RoutedEventArgs e)
         {
-            System.Windows.Forms.Integration.WindowsFormsHost host =
+            /*System.Windows.Forms.Integration.WindowsFormsHost host =
                 new System.Windows.Forms.Integration.WindowsFormsHost();
-
+            */
         }
     }
 

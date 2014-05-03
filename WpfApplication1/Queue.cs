@@ -32,6 +32,7 @@ namespace OS_Simulator
 
         public Queue(int type, double size, double pages = 0)
         {
+            _StatusReport = new List<Stats>();
             _Type = (QueueType) type;
             _MaxSize = size;
             _PageSizes = new Collection<double>();
@@ -233,11 +234,13 @@ namespace OS_Simulator
                 byteTotal += fi.Length;
                 fileCount += 1;
             }
-            
+
+            Stats insert = new Stats();
+
             // make each at four times the total size to test internal fragmentations
             
             // start with the halfs
-            half = new Memory(.5, 0, 4 * byteTotal, (int) Math.Floor((double)(4 * byteTotal / 512)), 0);
+            half = new Memory(.5, 0, 4 * byteTotal, (int) Math.Floor((double)(4 * byteTotal / 512)), 0, false);
 
             // for the next 10 seconds, generate random inserts and random removals of data to this set
             Stopwatch sw = new Stopwatch();
@@ -248,45 +251,591 @@ namespace OS_Simulator
                 half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double,double>(half.Get_Percent_Of_Page_Faults(),half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
             // rinse and repeat
 
-            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0);
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, false);
             sw.Start();
             while (sw.ElapsedMilliseconds < 10000)
             {
                 one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
             // rinse and repeat
 
-            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0);
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, false);
             sw.Start();
             while (sw.ElapsedMilliseconds < 10000)
             {
                 two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
             // rinse and repeat
 
-            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0);
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, false);
             sw.Start();
             while (sw.ElapsedMilliseconds < 10000)
             {
                 four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
-            }            
+            }
 
-            // push pages.
-            _Page1 = new Collection<string>(half.Get_Report());
-            _Page2 = new Collection<string>(one.Get_Report());
-            _Page3 = new Collection<string>(two.Get_Report());
-            _Page4 = new Collection<string>(four.Get_Report());
-
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // when complete notify gui
+            Notify_Complete();
         }
 
         public void Run_Paging_Rotation_FIFO()
         {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
 
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
+        }
+
+        public void Run_Paging_Rotation_LRU()
+        {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
+
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true, 1);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true, 1);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true, 1);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true, 1);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
+        }
+
+        public void Run_Paging_Rotation_LFU()
+        {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
+
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true, 2);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true, 2);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true, 2);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true, 2);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
+        }
+
+        public void Run_Paging_Rotation_Optomal()
+        {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
+
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true, 3);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true, 3);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true, 3);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true, 3);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
+        }
+
+        public void Run_Paging_Rotation_Second()
+        {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
+
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true, 4);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true, 4);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true, 4);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true, 4);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
+        }
+
+        public void Run_Paging_Rotation_Clock()
+        {
+            // run each block sim on these as : 512byte, 1024, 2048, 4096
+            Memory half, one, two, four;
+            // calculate size of files so we know how big to make these
+            long byteTotal, fileCount;
+            fileCount = byteTotal = 0;
+            foreach (FileInfo fi in _Files)
+            {
+                byteTotal += fi.Length;
+                fileCount += 1;
+            }
+
+            Stats insert = new Stats();
+
+            // make each at four times the total size to test internal fragmentations
+
+            // start with the halfs
+            half = new Memory(.5, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 512)), 0, true, 5);
+
+            // for the next 10 seconds, generate random inserts and random removals of data to this set
+            Stopwatch sw = new Stopwatch();
+            Random rand = new Random();
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                half.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                half.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "512";
+            insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            one = new Memory(1, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 1024)), 0, true, 5);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                one.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                one.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "1024";
+            insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            two = new Memory(2, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 2048)), 0, true, 5);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                two.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                two.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "2048";
+            insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+            sw.Reset();
+            // rinse and repeat
+
+            four = new Memory(4, 0, 4 * byteTotal, (int)Math.Floor((double)(4 * byteTotal / 4096)), 0, true, 5);
+            sw.Start();
+            while (sw.ElapsedMilliseconds < 10000)
+            {
+                four.Insert(_Files[rand.Next((int)fileCount)].Length, _Files[rand.Next((int)fileCount)].Name);
+                four.Remove(_Files[rand.Next((int)fileCount)].Name);
+            }
+
+            insert.Name = "Memory - Standard Paging";
+            insert.Grouping = "4096";
+            insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
+            _StatusReport.Add(insert);
+            insert = new Stats();
+
+            // when complete notify gui
+            Notify_Complete();
         }
 
 
