@@ -15,7 +15,8 @@ namespace OS_Simulator
         // will be -20 t0 20 for priority, lowest is highest priority
         private int _Priority;
         private long _RemainingTime;
-
+        private long _BurstTime;
+        private long _Wait;
         public long Size;
         public string ProcessID;
         public int Priority
@@ -38,7 +39,7 @@ namespace OS_Simulator
         {
             get
             {
-                return Make_Milliseconds(_Start);
+                return (Int32)(_Start.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             }
         }
 
@@ -46,7 +47,7 @@ namespace OS_Simulator
         {
             get
             {
-                return Make_Milliseconds(_End);
+                return (Int32)(_End.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
             }
         }
 
@@ -65,45 +66,50 @@ namespace OS_Simulator
 
         public Process(double ariveTime, double burstTime, int priority)
         {
+            Random rand = new Random();
             _Start = DateTime.Now;
-            _Start.AddSeconds(ariveTime);
-            
-            _End = new DateTime(Make_Milliseconds(_Start));
+            _Start.AddSeconds(ariveTime);            
+            _End = _Start.AddMilliseconds(rand.Next(101));
             _Priority = priority;
+            _BurstTime = _RemainingTime = (long)_End.Subtract(_Start).TotalMilliseconds;
         }
 
         public Process(double ariveTime, double burstTime)
         {
+            Random rand = new Random();
             _Start = DateTime.Now;
             _Start.AddSeconds(ariveTime);
-
-            _End = new DateTime(Make_Milliseconds(_Start));
+            _End = _Start.AddMilliseconds(rand.Next(101));
             _Priority = 0;
-        }
-
-        private long Make_Milliseconds(DateTime start)
-        {
-            double mil = start.ToUniversalTime().Subtract(new
-                         DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                         .TotalMilliseconds;
-            return (long)mil;
+            _BurstTime = _RemainingTime = (long)_End.Subtract(_Start).TotalMilliseconds;
         }
         
         public void PreEmpt()
         {
-            // get time ran
-            _End = DateTime.Now;
+            // get time ran            
             _RemainingTime = _End.Subtract(_Start).Milliseconds;
+            _End = DateTime.Now;
         }
 
         public void Start()
         {
+            // take note of wait time
+            if (_End < DateTime.Now)
+            {
+                _Wait += (long)DateTime.Now.Subtract(_End).TotalMilliseconds;
+            }
+            
             _Start = DateTime.Now;
         }
 
         public bool Completed()
         {
             return _RemainingTime <= 0;
+        }
+
+        public long Get_Wait_Time()
+        {
+            return _Wait;
         }
     }
 }

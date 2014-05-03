@@ -28,7 +28,7 @@ namespace OS_Simulator
         private FileInfo[] _Files;
         private List<Stats> _StatusReport;
         
-        public enum QueueType { Memory = 0, Paging = 1, Process = 2 };
+        public enum QueueType { Memory_Paging = 0, Process = 1 };
 
         public Queue(int type, double size, double pages = 0)
         {
@@ -54,6 +54,7 @@ namespace OS_Simulator
                     Process insert = new Process(Make_Start_Time(), Make_Burst_Time(), Make_Priority());
                     insert.ProcessID = p.ProcessName;
                     insert.Size = p.PeakPagedMemorySize64;
+                    //insert.StartTime = 
                     _ProcessList.Add(insert);
                 }
 
@@ -61,16 +62,12 @@ namespace OS_Simulator
                 _ProcessList = new Collection<Process>(_ProcessList.OrderBy(o => o.StartTime).ToList());
             }
 
-            else if (_Type == QueueType.Paging)
+            else if (_Type == QueueType.Memory_Paging)
             {
                 // here we need generated information regarding blocks of data, so for random fun, lets use frequent things
                 string localFolder = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
                 DirectoryInfo recentFolder = new DirectoryInfo(localFolder);
                 _Files = recentFolder.GetFiles();
-            }
-            else if (_Type == QueueType.Memory)
-            {
-
             }
         }
 
@@ -149,17 +146,17 @@ namespace OS_Simulator
         public void Run_Process_Sim_Priority()
         {
             // get first process here
-            Process p = _ProcessList.Where(o => o.Completed() == false).First();
+            Process p = _ProcessList.Where(o => o.Completed() == false).OrderBy(n=>n.StartTime).First();
 
             // while there is a process that hasn't completed yet
             while (_ProcessList.Any(o => o.Completed() == false))
             {
                 // let the process run until interupt by higher priority process or until the task is complete
-                while (_ProcessList.Where(o => o.StartTime < Process.Get_Current_Time())
-                                   .All(n=>n.Priority > p.Priority) && p.Completed() == false)
+                while (_ProcessList.All(n=>n.Priority > p.Priority) && p.Completed() == false)
                 {
+                    p.Start();
                     // wait one millisecond
-                    Thread.Sleep(1);
+                    //Thread.Sleep(1);
                 }
 
                 // if we didn't get done
@@ -176,6 +173,12 @@ namespace OS_Simulator
                     p = _ProcessList.FirstOrDefault(o => o.Completed() == false);
                 }
                 // don't adjust queues here
+            }
+
+            long sum = 0;
+            foreach(Process pr in _ProcessList)
+            {
+                sum += pr.Get_Wait_Time();
             }
 
             // when complete notify gui
@@ -340,7 +343,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - FIFO Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -356,7 +359,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - FIFO Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -372,7 +375,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - FIFO Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -388,7 +391,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - FIFO Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -428,7 +431,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LRU Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -444,7 +447,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LRU Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -460,7 +463,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LRU Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -476,7 +479,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LRU Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -516,7 +519,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LFU Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -532,7 +535,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LFU Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -548,7 +551,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LFU Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -564,7 +567,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - LFU Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -604,7 +607,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Optimal Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -620,7 +623,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Optimal Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -636,7 +639,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Optimal Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -652,7 +655,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Optimal Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -692,7 +695,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Second Chance Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -708,7 +711,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Second Chance Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -724,7 +727,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Second Chance Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -740,7 +743,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Second Chance Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -780,7 +783,7 @@ namespace OS_Simulator
                 half.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Clock Paging";
             insert.Grouping = "512";
             insert.ParameterList = new Tuple<double, double>(half.Get_Percent_Of_Page_Faults(), half.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -796,7 +799,7 @@ namespace OS_Simulator
                 one.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Clock Paging";
             insert.Grouping = "1024";
             insert.ParameterList = new Tuple<double, double>(one.Get_Percent_Of_Page_Faults(), one.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -812,7 +815,7 @@ namespace OS_Simulator
                 two.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Clock Paging";
             insert.Grouping = "2048";
             insert.ParameterList = new Tuple<double, double>(two.Get_Percent_Of_Page_Faults(), two.External_Fragmentation_Percent());
             _StatusReport.Add(insert);
@@ -828,7 +831,7 @@ namespace OS_Simulator
                 four.Remove(_Files[rand.Next((int)fileCount)].Name);
             }
 
-            insert.Name = "Memory - Standard Paging";
+            insert.Name = "Memory - Clock Paging";
             insert.Grouping = "4096";
             insert.ParameterList = new Tuple<double, double>(four.Get_Percent_Of_Page_Faults(), four.External_Fragmentation_Percent());
             _StatusReport.Add(insert);

@@ -215,9 +215,13 @@ namespace OS_Simulator
                     if (_ReplaceMethod == 2 || _ReplaceMethod == 4)
                     {
                         // edit the count by increasing by 1                        
-                        int count = int.Parse(target.Substring(target.LastIndexOf(" ") + 1));
+                        int result;
+                        bool success = int.TryParse(target.Substring(target.LastIndexOf(" ") + 1), out result);
+
+                        result = result + 1;
+
                         target = target.Substring(0, target.LastIndexOf(" "));
-                        target += " " + count.ToString();
+                        target += " " + result.ToString();
                     }
 
                     // now do the time stamp

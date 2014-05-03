@@ -9,9 +9,9 @@
         <oxy:Plot x:Name="Results" Title="Performance Graph" Model="{Binding PlotModel}" Margin="10" Grid.Row="1">
         </oxy:Plot>
         <StackPanel>
-            <WindowsFormsHost x:Name="host" Height="380" Width="485">
+            <!--WindowsFormsHost x:Name="host" Height="380" Width="485">
                 <winformchart:Chart x:Name="Graph" Dock="Fill"/>
-            </WindowsFormsHost>
+            </-->
         </StackPanel>
 
 
