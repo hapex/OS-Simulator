@@ -13,7 +13,7 @@ namespace WpfApplication1
         public Tuple<double,double> ParameterList;
         public Stats()
         {
-            
+
         }
     }
 }

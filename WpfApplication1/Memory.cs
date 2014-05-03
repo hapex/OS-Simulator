@@ -174,7 +174,15 @@ namespace OS_Simulator
 
         public double External_Fragmentation_Percent()
         {
-            return 100 * (_UsedSpace / (_End - Start));
+            int used = 0;
+            for (int i = 0 ; i < _Table.Length ; i +=1)
+            {
+                if (_Table[i])
+                {
+                    used +=1;
+                }
+            }
+            return 100 * (1 - ((double)used / _Table.Length));
         }
 
         //inserts [default] using first available
@@ -343,13 +351,12 @@ namespace OS_Simulator
                         }
 
                     }
-                    int last = 0;
 
                     // if more than one block to be moved
                     while (_Points.Count > 1)
                     {
                         // get data in this section
-                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " "));
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
                         
                         int localStart = int.Parse(moved.Substring(0,moved.IndexOf(" ")));
 
@@ -361,7 +368,7 @@ namespace OS_Simulator
                         int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
 
                         // toggle table to say used across the new area
-                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart); j += 1)
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
                         {
                             _Table[j] = true;
                         }
@@ -377,8 +384,6 @@ namespace OS_Simulator
 
                         // send back temp
                         _InternalFragReport.Add(temp);
-
-                        last = localEnd;
                     }
 
                     int now = MakeIntTime();
@@ -418,12 +423,49 @@ namespace OS_Simulator
 
                             sizeFreed = end - start;
 
+                            // track removal points (as we need contiguous memory - no ptrs in c#)
+                            _Points.Add(start);
+
                             Remove(start, end);
 
                             // now remove target from list as it's been nuked
                             _InternalFragReport.Remove(target);
                         }
 
+                    }
+
+                    // if more than one block to be moved
+                    while (_Points.Count > 1)
+                    {
+                        // get data in this section
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
+
+                        int localStart = int.Parse(moved.Substring(0, moved.IndexOf(" ")));
+
+                        // this will be updated, so remove from report
+                        _InternalFragReport.Remove(moved);
+
+                        // get it's end
+                        string temp = moved.Substring(moved.IndexOf(" - ") + 3);
+                        int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                        // toggle table to say used across the new area
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
+                        {
+                            _Table[j] = true;
+                        }
+                        // free old area
+                        for (int j = localStart; j < localEnd; j += 1)
+                        {
+                            _Table[j] = false;
+                        }
+
+                        // update string
+                        temp = temp.Substring(temp.IndexOf(" "));
+                        temp = _Points.ToString() + " " + localEnd + " " + temp;
+
+                        // send back temp
+                        _InternalFragReport.Add(temp);
                     }
                     int now = MakeIntTime();
                     // insert lives at i
@@ -461,12 +503,49 @@ namespace OS_Simulator
 
                             sizeFreed = end - start;
 
+                            // track removal points (as we need contiguous memory - no ptrs in c#)
+                            _Points.Add(start);
+
                             Remove(start, end);
 
                             // now remove target from list as it's been nuked
                             _InternalFragReport.Remove(target);
                         }
 
+                    }
+
+                    // if more than one block to be moved
+                    while (_Points.Count > 1)
+                    {
+                        // get data in this section
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
+
+                        int localStart = int.Parse(moved.Substring(0, moved.IndexOf(" ")));
+
+                        // this will be updated, so remove from report
+                        _InternalFragReport.Remove(moved);
+
+                        // get it's end
+                        string temp = moved.Substring(moved.IndexOf(" - ") + 3);
+                        int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                        // toggle table to say used across the new area
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
+                        {
+                            _Table[j] = true;
+                        }
+                        // free old area
+                        for (int j = localStart; j < localEnd; j += 1)
+                        {
+                            _Table[j] = false;
+                        }
+
+                        // update string
+                        temp = temp.Substring(temp.IndexOf(" "));
+                        temp = _Points.ToString() + " " + localEnd + " " + temp;
+
+                        // send back temp
+                        _InternalFragReport.Add(temp);
                     }
                     int now = MakeIntTime();
                     // insert lives at i
@@ -503,12 +582,49 @@ namespace OS_Simulator
 
                             sizeFreed = end - start;
 
+                            // track removal points (as we need contiguous memory - no ptrs in c#)
+                            _Points.Add(start);
+
                             Remove(start, end);
 
                             // now remove target from list as it's been nuked
                             _InternalFragReport.Remove(target);
                         }
 
+                    }
+
+                    // if more than one block to be moved
+                    while (_Points.Count > 1)
+                    {
+                        // get data in this section
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
+
+                        int localStart = int.Parse(moved.Substring(0, moved.IndexOf(" ")));
+
+                        // this will be updated, so remove from report
+                        _InternalFragReport.Remove(moved);
+
+                        // get it's end
+                        string temp = moved.Substring(moved.IndexOf(" - ") + 3);
+                        int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                        // toggle table to say used across the new area
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
+                        {
+                            _Table[j] = true;
+                        }
+                        // free old area
+                        for (int j = localStart; j < localEnd; j += 1)
+                        {
+                            _Table[j] = false;
+                        }
+
+                        // update string
+                        temp = temp.Substring(temp.IndexOf(" "));
+                        temp = _Points.ToString() + " " + localEnd + " " + temp;
+
+                        // send back temp
+                        _InternalFragReport.Add(temp);
                     }
                     // insert lives at i
                     insert = i.ToString() + " - " + (i + blockCount).ToString() + " "
@@ -547,6 +663,10 @@ namespace OS_Simulator
 
                                     sizeFreed = end - start;
 
+
+                                    // track removal points (as we need contiguous memory - no ptrs in c#)
+                                    _Points.Add(start);
+
                                     Remove(start, end);
 
                                     // now remove target from list as it's been nuked
@@ -562,7 +682,40 @@ namespace OS_Simulator
                                 }
                             }
                         }
+                    }
 
+                    // if more than one block to be moved
+                    while (_Points.Count > 1)
+                    {
+                        // get data in this section
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
+                        
+                        int localStart = int.Parse(moved.Substring(0,moved.IndexOf(" ")));
+
+                        // this will be updated, so remove from report
+                        _InternalFragReport.Remove(moved);
+
+                        // get it's end
+                        string temp = moved.Substring(moved.IndexOf(" - ") + 3);
+                        int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                        // toggle table to say used across the new area
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
+                        {
+                            _Table[j] = true;
+                        }
+                        // free old area
+                        for (int j = localStart ; j < localEnd ; j += 1)
+                        {
+                            _Table[j] = false;
+                        }
+
+                        // update string
+                        temp = temp.Substring(temp.IndexOf(" "));
+                        temp = _Points.ToString() + " " + localEnd + " " + temp;
+
+                        // send back temp
+                        _InternalFragReport.Add(temp);
                     }
                     int now = MakeIntTime();
                     // insert lives at i
@@ -603,12 +756,49 @@ namespace OS_Simulator
 
                             sizeFreed = end - start;
 
+                            // track removal points (as we need contiguous memory - no ptrs in c#)
+                            _Points.Add(start);
+
                             Remove(start, end);
 
                             // now remove target from list as it's been nuked
                             _InternalFragReport.Remove(target);
                         }
 
+                    }
+
+                    // if more than one block to be moved
+                    while (_Points.Count > 1)
+                    {
+                        // get data in this section
+                        string moved = _InternalFragReport.First(o => o.Contains(_Points.First().ToString() + " - "));
+
+                        int localStart = int.Parse(moved.Substring(0, moved.IndexOf(" ")));
+
+                        // this will be updated, so remove from report
+                        _InternalFragReport.Remove(moved);
+
+                        // get it's end
+                        string temp = moved.Substring(moved.IndexOf(" - ") + 3);
+                        int localEnd = int.Parse(temp.Substring(0, temp.IndexOf(" ")));
+
+                        // toggle table to say used across the new area
+                        for (int j = _Points.First(); j < _Points.First() + (localEnd - localStart) + 1; j += 1)
+                        {
+                            _Table[j] = true;
+                        }
+                        // free old area
+                        for (int j = localStart; j < localEnd; j += 1)
+                        {
+                            _Table[j] = false;
+                        }
+
+                        // update string
+                        temp = temp.Substring(temp.IndexOf(" "));
+                        temp = _Points.ToString() + " " + localEnd + " " + temp;
+
+                        // send back temp
+                        _InternalFragReport.Add(temp);
                     }
                     int now = MakeIntTime();
                     // insert lives at i
@@ -751,9 +941,9 @@ namespace OS_Simulator
             return mapper.OrderByDescending(o => o.Value).First().Key;
         }
 
-        public List<Stats> Get_Stats()
+        public double Get_Percent_Of_Page_Faults()
         {
-            return _StatusReport;
+            return ((double)_PageFaults / _PageAccesses);
         }
 
 #endregion

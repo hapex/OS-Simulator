@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
+using WpfApplication1;
 
 namespace OS_Simulator
 {
@@ -25,6 +26,7 @@ namespace OS_Simulator
         private Dictionary<string, double> _FragmentationChart;
         private Collection<string> _Log;
         private FileInfo[] _Files;
+        private List<Stats> _StatusReport;
         
         public enum QueueType { Memory = 0, Paging = 1, Process = 2 };
 
@@ -300,6 +302,10 @@ namespace OS_Simulator
             page2 = _Page2;
             page3 = _Page3;
             page4 = _Page4;
+        }
+        public List<Stats> Get_Stats()
+        {
+            return _StatusReport;
         }
     }
 }
