@@ -27,6 +27,9 @@ namespace OS_Simulator
             // needs rework for dialog after simulation....
             InitializeComponent();
 
+            //Set title of the window
+            this.Title = list[0].Name;
+
             // Create Chart object
             Chart chart = this.FindName("Graph") as Chart;
             
