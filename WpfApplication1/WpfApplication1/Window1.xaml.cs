@@ -30,30 +30,42 @@ namespace OS_Simulator
             // Create Chart object
             Chart chart = this.FindName("Graph") as Chart;
             
-            
+            // Add chart Area to the graph
             chart.ChartAreas.Add("area");
             chart.ChartAreas["area"].AxisY.Interval = 1;
             
+            // Create a legend
+            chart.Legends.Add(new Legend("legend"));
+            // Dock legend to chart area
+            chart.Legends["legend"].DockedToChartArea = "area";
+
+            // add the first series to the graph
             chart.Series.Add(list[0].Series1);
             chart.Series[list[0].Series1].ChartType = SeriesChartType.Column;
+
+            // If the 2nd series exists, add it to the graph
             if (list[0].Series2 != null)
             {
                 chart.Series.Add(list[0].Series2);
                 chart.Series[list[0].Series2].ChartType = SeriesChartType.Column;
             }
 
+            // Add the data source to graph
             chart.DataSource = list;
+
+            // Hook up the 1st series to the graph
             chart.Series[list[0].Series1].XValueMember = "Grouping";
             chart.Series[list[0].Series1].YValueMembers = "Stat1";
+            chart.Series[list[0].Series1].Legend = "legend";
+
+            // If the 2nd Series exists, hook it up to the graph
             if (list[0].Series2 != null)
             {
                 chart.Series[list[0].Series2].XValueMember = "Grouping";
                 chart.Series[list[0].Series2].YValueMembers = "Stat2";
+                chart.Series[list[0].Series2].Legend = "legend";
             }
 
-            //chart.DataBind();
-            //chart.Series["series"].XValueMember = "X";
-            //chart.Series["series"].YValueMembers = "Y";
 
         }
 
