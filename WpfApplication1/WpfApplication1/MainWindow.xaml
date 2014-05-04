@@ -20,7 +20,7 @@
         <Button Height="35" Width="140" Margin="184,210,183,81" Click="OnBestClicked">
             <Label>Combinded Best</Label>
         </Button>
-        <Button Height="35" Width="75" Margin="184,250,183,41">
+        <Button Height="35" Width="75" Margin="184,250,183,41" Click="OnExitClicked">
             <Label>Exit</Label>
         </Button>
     </Grid>

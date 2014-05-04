@@ -1,4 +1,4 @@
-﻿<Window x:Class="WpfApplication1.MainWindow"
+﻿<Window x:Class="OS_Simulator.Window1"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:oxy="http://oxyplot.codeplex.com"
@@ -8,11 +8,15 @@
     <Grid>
         <oxy:Plot x:Name="Results" Title="Performance Graph" Model="{Binding PlotModel}" Margin="10" Grid.Row="1">
         </oxy:Plot>
-        <StackPanel>
-            <WindowsFormsHost x:Name="host" Height="380" Width="485">
-                <winformchart:Chart x:Name="Graph" Dock="Fill"/>
+        <DockPanel LastChildFill="True">
+            <WindowsFormsHost x:Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+                <winformchart:Chart x:Name="Graph" Dock="Fill">
+                    <winformchart:Chart.ChartAreas>
+                        <winformchart:ChartArea Name="ChartArea"/>
+                    </winformchart:Chart.ChartAreas>
+                </winformchart:Chart>    
             </WindowsFormsHost>
-        </StackPanel>
+        </DockPanel>
 
 
     </Grid>

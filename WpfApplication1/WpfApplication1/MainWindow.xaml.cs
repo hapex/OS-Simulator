@@ -30,21 +30,77 @@ namespace OS_Simulator
 
         private void OnProcessSimClicked(object sender, RoutedEventArgs e)
         {
+            List<Stats> list = new List<Stats>();
 
+
+            //// Debuging code
+            //Stats obj = new Stats();
+
+            //obj.Name = "Test1";
+            //obj.Grouping = "A";
+            //obj.Series1 = "Alpha";
+            //obj.Series2 = "Beta";
+            //obj.Stat1 = 1;
+            //obj.Stat2 = 6;
+
+            //list.Add(obj);
+
+            //Stats obj2 = new Stats();
+            //obj2.Name = "Test1";
+            //obj2.Grouping = "B";
+            //obj2.Series1 = "Alpha";
+            //obj2.Series2 = "Beta";
+            //obj2.Stat1 = 8;
+            //obj2.Stat2 = 16;
+
+            //list.Add(obj2);
+
+            //Stats obj3 = new Stats();
+            //obj3.Name = "Test1";
+            //obj3.Grouping = "C";
+            //obj3.Series1 = "Alpha";
+            //obj3.Series2 = "Beta";
+            //obj3.Stat1 = 3;
+            //obj3.Stat2 = 4;
+
+            //list.Add(obj3);
+
+            var window1 = new Window1(list);
+            window1.Show();
         }
 
         private void OnMemorySimClicked(object sender, RoutedEventArgs e)
         {
+            List<Stats> list = new List<Stats>();
 
+            // call Memory run here
+
+            var window1 = new Window1(list);
+            window1.Show();
         }
 
         private void OnPagingSimClicked(object sender, RoutedEventArgs e)
         {
+            List<Stats> list = new List<Stats>();
 
+            // call Paging run here
+
+            var window1 = new Window1(list);
+            window1.Show();
         }
         private void OnBestClicked(object sender, RoutedEventArgs e)
         {
+            List<Stats> list = new List<Stats>();
 
+            // call run here
+
+            var window1 = new Window1(list);
+            window1.Show();
+        }
+
+        private void OnExitClicked(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }
